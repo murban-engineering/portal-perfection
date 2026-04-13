@@ -33,6 +33,7 @@ const Navigation = () => {
         <Link to="/">
           <Logo />
         </Link>
+      </div>
     </header>
   );
 };
