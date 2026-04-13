@@ -22,23 +22,22 @@ const Contact = () => {
   return (
     <Layout>
       <div className="min-h-screen flex items-center justify-center bg-background px-6">
-        <div className="w-full max-w-2xl animate-fade-in">
-          {/* Contact Items */}
-          <div className="space-y-12">
+        <div className="w-full max-w-3xl animate-fade-in">
+          <div className="space-y-16">
             {contactInfo.map((item, index) => (
               <div 
                 key={index}
-                className="border-l-2 border-muted pl-6 py-2"
+                className="border-l-2 border-muted-foreground/20 pl-8 py-2"
               >
                 {item.href ? (
                   <a 
                     href={item.href}
-                    className="contact-value hover:text-white transition-colors block mb-2"
+                    className="contact-value hover:text-white transition-colors block"
                   >
                     {item.value}
                   </a>
                 ) : (
-                  <p className="contact-value mb-2">{item.value}</p>
+                  <p className="contact-value">{item.value}</p>
                 )}
                 <p className="contact-label">{item.label}</p>
               </div>
