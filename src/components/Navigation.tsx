@@ -29,7 +29,10 @@ const Navigation = () => {
             </Link>
           ))}
         </nav>
-      </div>
+        
+        <Link to="/">
+          <Logo />
+        </Link>
     </header>
   );
 };
