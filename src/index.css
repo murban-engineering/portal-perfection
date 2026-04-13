@@ -119,11 +119,11 @@
   }
   
   .contact-value {
-    @apply text-2xl md:text-3xl text-subtitle font-light;
+    @apply text-3xl md:text-4xl text-subtitle font-light tracking-wide;
   }
   
   .contact-label {
-    @apply text-sm text-label uppercase tracking-wider;
+    @apply text-xs text-muted-foreground uppercase tracking-widest mt-1;
   }
 }
 
