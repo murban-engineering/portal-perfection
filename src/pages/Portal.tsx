@@ -34,6 +34,11 @@ const Portal = () => {
   }, []);
 
   const fetchClients = async () => {
+    if (!supabase) {
+      setClients([]);
+      return;
+    }
+
     const { data, error } = await supabase.from("clients").select("*");
     if (data) setClients(data);
     if (error) console.error("Error fetching clients:", error);
@@ -90,6 +95,10 @@ const Portal = () => {
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!resetClient) return;
+    if (!supabase) {
+      setError("Portal database is not configured.");
+      return;
+    }
 
     if (currentPassword !== resetClient.password) {
       setError("Current password is incorrect.");
@@ -204,6 +213,12 @@ const Portal = () => {
             Search your company, enter your passkey, and launch your Murban app
             securely.
           </p>
+
+          {!supabase && (
+            <p className="mb-6 text-sm text-destructive">
+              Portal data is temporarily unavailable. Please contact support.
+            </p>
+          )}
 
           {step === "search" && (
             <div>
