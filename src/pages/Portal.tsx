@@ -1,67 +1,371 @@
-import { useState } from "react";
-import { Search } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Search, Lock, ArrowLeft, X, KeyRound } from "lucide-react";
 import Layout from "@/components/Layout";
 import heroImage from "@/assets/hero-industrial.jpg";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+
+interface Client {
+  id: string;
+  name: string;
+  password: string;
+  app_url: string;
+}
+
+type Step = "search" | "password" | "app" | "reset";
 
 const Portal = () => {
-  const [username, setUsername] = useState("");
-  
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle search/login logic here
-    console.log("Searching for:", username);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredClients, setFilteredClients] = useState<Client[]>([]);
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [password, setPassword] = useState("");
+  const [step, setStep] = useState<Step>("search");
+  const [error, setError] = useState("");
+
+  // Reset password state
+  const [resetClient, setResetClient] = useState<Client | null>(null);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  useEffect(() => {
+    fetchClients();
+  }, []);
+
+  const fetchClients = async () => {
+    const { data, error } = await supabase.from("clients").select("*");
+    if (data) setClients(data);
+    if (error) console.error("Error fetching clients:", error);
   };
-  
+
+  useEffect(() => {
+    if (searchTerm.trim() === "") {
+      setFilteredClients([]);
+    } else {
+      setFilteredClients(
+        clients.filter((c) =>
+          c.name.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      );
+    }
+  }, [searchTerm, clients]);
+
+  const handleSelectClient = (client: Client) => {
+    setSelectedClient(client);
+    setStep("password");
+    setPassword("");
+    setError("");
+    setSearchTerm("");
+  };
+
+  const handlePasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (selectedClient && password === selectedClient.password) {
+      setStep("app");
+      setError("");
+    } else {
+      setError("Incorrect password. Please try again.");
+    }
+  };
+
+  const handleBack = () => {
+    if (step === "password") {
+      setStep("search");
+      setSelectedClient(null);
+      setPassword("");
+      setError("");
+    } else if (step === "app") {
+      setStep("password");
+      setPassword("");
+    } else if (step === "reset") {
+      setStep("search");
+      setResetClient(null);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!resetClient) return;
+
+    if (currentPassword !== resetClient.password) {
+      setError("Current password is incorrect.");
+      return;
+    }
+    if (newPassword.length < 3) {
+      setError("New password must be at least 3 characters.");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setError("New passwords do not match.");
+      return;
+    }
+
+    const { error: updateError } = await supabase
+      .from("clients")
+      .update({ password: newPassword })
+      .eq("id", resetClient.id);
+
+    if (updateError) {
+      setError("Failed to update password. Please try again.");
+      console.error(updateError);
+    } else {
+      toast.success("Password updated successfully!");
+      setStep("search");
+      setResetClient(null);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setError("");
+      fetchClients();
+    }
+  };
+
+  const openResetForClient = (client: Client) => {
+    setResetClient(client);
+    setStep("reset");
+    setError("");
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setSearchTerm("");
+  };
+
+  // Fullscreen app view
+  if (step === "app" && selectedClient) {
+    return (
+      <div className="fixed inset-0 z-50 bg-background flex flex-col">
+        <div className="flex items-center justify-between px-4 py-3 bg-card border-b border-border">
+          <button
+            onClick={handleBack}
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span className="text-sm">Back to Portal</span>
+          </button>
+          <span className="text-sm text-muted-foreground font-medium">
+            {selectedClient.name}
+          </span>
+          <button
+            onClick={() => {
+              setStep("search");
+              setSelectedClient(null);
+            }}
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        <iframe
+          src={selectedClient.app_url}
+          className="flex-1 w-full border-0"
+          title={selectedClient.name}
+          allow="fullscreen"
+        />
+      </div>
+    );
+  }
+
   return (
     <Layout>
       <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
         {/* Background Image */}
-        <div 
+        <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url(${heroImage})` }}
         />
-        
-        {/* Overlay - slightly darker for portal */}
-        <div 
+
+        {/* Overlay */}
+        <div
           className="absolute inset-0"
-          style={{ 
+          style={{
             background: `linear-gradient(to bottom, 
               hsla(220, 20%, 6%, 0.6) 0%,
               hsla(220, 20%, 6%, 0.7) 50%,
               hsla(220, 20%, 6%, 0.85) 100%
-            )` 
+            )`,
           }}
         />
-        
+
         {/* Decorative squares */}
         <div className="absolute left-[15%] top-1/4 w-16 h-16 border border-white/10 rotate-45 hidden lg:block" />
         <div className="absolute right-[15%] top-1/3 w-12 h-12 border border-white/10 rotate-12 hidden lg:block" />
         <div className="absolute left-[10%] bottom-1/3 w-10 h-10 border border-white/10 -rotate-12 hidden lg:block" />
         <div className="absolute right-[20%] bottom-1/4 w-14 h-14 border border-white/10 rotate-45 hidden lg:block" />
-        
+
         {/* Content */}
         <div className="relative z-10 text-center px-6 w-full max-w-3xl animate-fade-in">
-          <h1 className="portal-title mb-6">
-            Secure Client Portal
-          </h1>
-          
+          <h1 className="portal-title mb-6">Secure Client Portal</h1>
+
           <p className="hero-subtitle mb-12">
-            Search your company, select your terminal location, enter your passkey, and launch your Murban app securely.
+            Search your company, enter your passkey, and launch your Murban app
+            securely.
           </p>
-          
-          {/* Search Form */}
-          <form onSubmit={handleSubmit} className="relative">
-            <div className="relative">
-              <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter your username"
-                className="search-input"
-              />
+
+          {step === "search" && (
+            <div>
+              {/* Search Input */}
+              <div className="relative">
+                <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search your company name..."
+                  className="search-input"
+                />
+              </div>
+
+              {/* Results dropdown */}
+              {filteredClients.length > 0 && (
+                <div className="mt-2 bg-white rounded-2xl shadow-lg overflow-hidden text-left">
+                  {filteredClients.map((client) => (
+                    <div
+                      key={client.id}
+                      className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-0"
+                    >
+                      <button
+                        onClick={() => handleSelectClient(client)}
+                        className="flex-1 text-left text-gray-900 font-medium"
+                      >
+                        {client.name}
+                      </button>
+                      <button
+                        onClick={() => openResetForClient(client)}
+                        className="ml-4 text-gray-400 hover:text-accent transition-colors"
+                        title="Reset Password"
+                      >
+                        <KeyRound className="w-5 h-5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {searchTerm.trim() !== "" && filteredClients.length === 0 && (
+                <p className="mt-4 text-subtitle text-sm">
+                  No companies found matching "{searchTerm}"
+                </p>
+              )}
             </div>
-          </form>
+          )}
+
+          {step === "password" && selectedClient && (
+            <div>
+              <div className="mb-6">
+                <button
+                  onClick={handleBack}
+                  className="text-subtitle hover:text-white transition-colors text-sm flex items-center gap-2 mx-auto"
+                >
+                  <ArrowLeft className="w-4 h-4" /> Back to search
+                </button>
+              </div>
+              <p className="text-white text-xl mb-6 font-medium">
+                {selectedClient.name}
+              </p>
+              <form onSubmit={handlePasswordSubmit} className="relative">
+                <div className="relative">
+                  <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setError("");
+                    }}
+                    placeholder="Enter your passkey"
+                    className="search-input"
+                    autoFocus
+                  />
+                </div>
+                {error && (
+                  <p className="mt-3 text-red-400 text-sm">{error}</p>
+                )}
+                <button
+                  type="submit"
+                  className="mt-6 px-10 py-3 bg-white text-gray-900 rounded-full font-medium hover:bg-gray-100 transition-colors"
+                >
+                  Launch App
+                </button>
+              </form>
+            </div>
+          )}
+
+          {step === "reset" && resetClient && (
+            <div>
+              <div className="mb-6">
+                <button
+                  onClick={handleBack}
+                  className="text-subtitle hover:text-white transition-colors text-sm flex items-center gap-2 mx-auto"
+                >
+                  <ArrowLeft className="w-4 h-4" /> Back to search
+                </button>
+              </div>
+              <p className="text-white text-xl mb-2 font-medium">
+                Reset Password
+              </p>
+              <p className="text-subtitle text-sm mb-6">
+                {resetClient.name}
+              </p>
+              <form
+                onSubmit={handleResetPassword}
+                className="space-y-4 max-w-md mx-auto"
+              >
+                <div className="relative">
+                  <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="password"
+                    value={currentPassword}
+                    onChange={(e) => {
+                      setCurrentPassword(e.target.value);
+                      setError("");
+                    }}
+                    placeholder="Current password"
+                    className="search-input text-base"
+                    autoFocus
+                  />
+                </div>
+                <div className="relative">
+                  <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => {
+                      setNewPassword(e.target.value);
+                      setError("");
+                    }}
+                    placeholder="New password"
+                    className="search-input text-base"
+                  />
+                </div>
+                <div className="relative">
+                  <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => {
+                      setConfirmPassword(e.target.value);
+                      setError("");
+                    }}
+                    placeholder="Confirm new password"
+                    className="search-input text-base"
+                  />
+                </div>
+                {error && (
+                  <p className="text-red-400 text-sm">{error}</p>
+                )}
+                <button
+                  type="submit"
+                  className="w-full py-3 bg-white text-gray-900 rounded-full font-medium hover:bg-gray-100 transition-colors"
+                >
+                  Update Password
+                </button>
+              </form>
+            </div>
+          )}
         </div>
       </div>
     </Layout>
