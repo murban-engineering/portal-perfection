@@ -15,11 +15,8 @@ const Navigation = () => {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 px-6 py-4">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <Link to="/">
-          <Logo />
-        </Link>
-        
         <nav className="nav-pill">
+
           {navItems.map((item) => (
             <Link
               key={item.path}
@@ -32,6 +29,10 @@ const Navigation = () => {
             </Link>
           ))}
         </nav>
+        
+        <Link to="/">
+          <Logo />
+        </Link>
       </div>
     </header>
   );
