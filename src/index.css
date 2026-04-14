@@ -79,11 +79,11 @@
 
 @layer components {
   .nav-pill {
-    @apply bg-nav rounded-full px-1 py-1 flex items-center gap-1;
+    @apply bg-nav rounded-full px-1 py-0.5 flex items-center gap-1;
   }
   
   .nav-item {
-    @apply px-6 py-2 rounded-full text-sm font-medium transition-all duration-200;
+    @apply px-5 py-1.5 rounded-full text-sm font-medium transition-all duration-200;
   }
   
   .nav-item-active {
