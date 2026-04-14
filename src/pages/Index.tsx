@@ -32,16 +32,14 @@ const Index = () => {
           </h1>
           
           <p className="hero-subtitle mb-16">
-            Industrial Engineering Solutions & Client Resources
-            <br />
-            Portal
+            Industrial Engineering Solutions & Client Resources Portal
           </p>
           
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-16">
             <Link to="/portal" className="cta-button group">
               <span className="cta-icon group-hover:bg-accent transition-colors">
-                <ChevronRight className="w-5 h-5 md:w-8 md:h-8 lg:w-12 lg:h-12" />
+                <ChevronRight className="w-5 h-5" />
               </span>
               <span>Portal</span>
             </Link>
@@ -53,7 +51,7 @@ const Index = () => {
               className="cta-button group"
             >
               <span className="cta-icon group-hover:bg-accent transition-colors">
-                <ChevronRight className="w-5 h-5 md:w-8 md:h-8 lg:w-12 lg:h-12" />
+                <ChevronRight className="w-5 h-5" />
               </span>
               <span>Official Website</span>
             </a>

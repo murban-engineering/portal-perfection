@@ -17,7 +17,7 @@ const Navigation = () => {
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <Link to="/" className="flex items-center gap-3">
           <Logo />
-          <span className="brand-wordmark">Murban Engineering</span>
+          <span className="text-white text-xl font-bold tracking-wide">Murban Engineering</span>
         </Link>
         
         <nav className="nav-pill">
