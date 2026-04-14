@@ -250,10 +250,11 @@ const Portal = () => {
                       </button>
                       <button
                         onClick={() => openResetForClient(client)}
-                        className="ml-4 text-gray-400 hover:text-accent transition-colors"
+                        className="ml-4 flex items-center gap-1.5 px-3 py-1.5 bg-accent/10 text-accent hover:bg-accent hover:text-white rounded-full text-xs font-semibold transition-all duration-200"
                         title="Reset Password"
                       >
-                        <KeyRound className="w-5 h-5" />
+                        <KeyRound className="w-4 h-4" />
+                        <span>Reset</span>
                       </button>
                     </div>
                   ))}
