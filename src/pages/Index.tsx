@@ -53,7 +53,8 @@ const Index = () => {
               <span className="cta-icon group-hover:bg-accent transition-colors">
                 <ChevronRight className="w-5 h-5" />
               </span>
-              <span>Official Website</span>
+              <span className="sm:hidden">Website</span>
+              <span className="hidden sm:inline">Official Website</span>
             </a>
           </div>
         </div>
