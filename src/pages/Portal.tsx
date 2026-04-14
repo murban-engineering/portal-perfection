@@ -45,7 +45,7 @@ const Portal = () => {
   };
 
   useEffect(() => {
-    if (searchTerm.trim() === "") {
+    if (searchTerm.trim().length < 4) {
       setFilteredClients([]);
     } else {
       setFilteredClients(
@@ -146,35 +146,37 @@ const Portal = () => {
   // Fullscreen app view
   if (step === "app" && selectedClient) {
     return (
-      <div className="fixed inset-0 z-50 bg-background flex flex-col">
-        <div className="flex items-center justify-between px-4 py-3 bg-card border-b border-border">
-          <button
-            onClick={handleBack}
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            <span className="text-sm">Back to Portal</span>
-          </button>
-          <span className="text-sm text-muted-foreground font-medium">
-            {selectedClient.name}
-          </span>
-          <button
-            onClick={() => {
-              setStep("search");
-              setSelectedClient(null);
-            }}
-            className="text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
+      <Layout>
+        <div className="fixed inset-0 z-40 bg-background flex flex-col pt-16">
+          <div className="flex items-center justify-between px-4 py-3 bg-card border-b border-border">
+            <button
+              onClick={handleBack}
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              <span className="text-sm">Back to Portal</span>
+            </button>
+            <span className="text-sm text-muted-foreground font-medium">
+              {selectedClient.name}
+            </span>
+            <button
+              onClick={() => {
+                setStep("search");
+                setSelectedClient(null);
+              }}
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          <iframe
+            src={selectedClient.app_url}
+            className="flex-1 w-full border-0"
+            title={selectedClient.name}
+            allow="fullscreen"
+          />
         </div>
-        <iframe
-          src={selectedClient.app_url}
-          className="flex-1 w-full border-0"
-          title={selectedClient.name}
-          allow="fullscreen"
-        />
-      </div>
+      </Layout>
     );
   }
 
@@ -261,7 +263,7 @@ const Portal = () => {
                 </div>
               )}
 
-              {searchTerm.trim() !== "" && filteredClients.length === 0 && (
+              {searchTerm.trim().length >= 4 && filteredClients.length === 0 && (
                 <p className="mt-4 text-subtitle text-sm">
                   No companies found matching "{searchTerm}"
                 </p>
