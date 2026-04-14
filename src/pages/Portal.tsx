@@ -147,7 +147,7 @@ const Portal = () => {
   if (step === "app" && selectedClient) {
     return (
       <Layout>
-        <div className="fixed inset-x-0 bottom-0 top-24 z-40 bg-background">
+        <div className="fixed inset-x-0 bottom-0 top-20 z-40 bg-background">
           <iframe
             src={selectedClient.app_url}
             className="h-full w-full border-0"
