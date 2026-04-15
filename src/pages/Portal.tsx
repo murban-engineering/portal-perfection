@@ -10,9 +10,10 @@ interface Client {
   name: string;
   password: string;
   app_url: string;
+  terminal_location: string | null;
 }
 
-type Step = "search" | "password" | "app" | "reset";
+type Step = "search" | "terminal" | "password" | "app" | "reset";
 
 const Portal = () => {
   const [clients, setClients] = useState<Client[]>([]);
