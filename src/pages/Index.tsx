@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import Layout from "@/components/Layout";
-import heroImage from "@/assets/hero-industrial.jpg";
+const heroImage = "/aerial-view-gas-oil-refinery-oil-industry.jpg";
 
 const Index = () => {
   return (
