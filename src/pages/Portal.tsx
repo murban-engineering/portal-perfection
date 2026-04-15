@@ -92,9 +92,19 @@ const Portal = () => {
   };
 
   const handleBack = () => {
-    if (step === "password") {
+    if (step === "terminal") {
       setStep("search");
       setSelectedClient(null);
+      setTerminalInput("");
+      setError("");
+    } else if (step === "password") {
+      if (selectedClient?.terminal_location) {
+        setStep("terminal");
+        setTerminalInput("");
+      } else {
+        setStep("search");
+        setSelectedClient(null);
+      }
       setPassword("");
       setError("");
     } else if (step === "app") {
