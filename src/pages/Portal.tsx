@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Search, Lock, ArrowLeft, KeyRound } from "lucide-react";
+import { Search, Lock, ArrowLeft, KeyRound, MapPin } from "lucide-react";
 import Layout from "@/components/Layout";
 import heroImage from "@/assets/hero-industrial.jpg";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,9 +10,10 @@ interface Client {
   name: string;
   password: string;
   app_url: string;
+  terminal_location: string | null;
 }
 
-type Step = "search" | "password" | "app" | "reset";
+type Step = "search" | "terminal" | "password" | "app" | "reset";
 
 const Portal = () => {
   const [clients, setClients] = useState<Client[]>([]);
@@ -22,6 +23,7 @@ const Portal = () => {
   const [password, setPassword] = useState("");
   const [step, setStep] = useState<Step>("search");
   const [error, setError] = useState("");
+  const [terminalInput, setTerminalInput] = useState("");
 
   // Reset password state
   const [resetClient, setResetClient] = useState<Client | null>(null);
@@ -40,7 +42,7 @@ const Portal = () => {
     }
 
     const { data, error } = await supabase.from("clients").select("*");
-    if (data) setClients(data);
+    if (data) setClients(data as Client[]);
     if (error) console.error("Error fetching clients:", error);
   };
 
@@ -58,10 +60,25 @@ const Portal = () => {
 
   const handleSelectClient = (client: Client) => {
     setSelectedClient(client);
-    setStep("password");
+    if (client.terminal_location) {
+      setStep("terminal");
+      setTerminalInput("");
+    } else {
+      setStep("password");
+    }
     setPassword("");
     setError("");
     setSearchTerm("");
+  };
+
+  const handleTerminalSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (selectedClient && terminalInput.trim().toLowerCase() === selectedClient.terminal_location?.toLowerCase()) {
+      setStep("password");
+      setError("");
+    } else {
+      setError("Incorrect terminal location. Please try again.");
+    }
   };
 
   const handlePasswordSubmit = (e: React.FormEvent) => {
@@ -75,9 +92,19 @@ const Portal = () => {
   };
 
   const handleBack = () => {
-    if (step === "password") {
+    if (step === "terminal") {
       setStep("search");
       setSelectedClient(null);
+      setTerminalInput("");
+      setError("");
+    } else if (step === "password") {
+      if (selectedClient?.terminal_location) {
+        setStep("terminal");
+        setTerminalInput("");
+      } else {
+        setStep("search");
+        setSelectedClient(null);
+      }
       setPassword("");
       setError("");
     } else if (step === "app") {
@@ -247,6 +274,50 @@ const Portal = () => {
                   No companies found matching "{searchTerm}"
                 </p>
               )}
+            </div>
+          )}
+
+          {step === "terminal" && selectedClient && (
+            <div>
+              <div className="mb-6">
+                <button
+                  onClick={handleBack}
+                  className="text-subtitle hover:text-white transition-colors text-sm flex items-center gap-2 mx-auto"
+                >
+                  <ArrowLeft className="w-4 h-4" /> Back to search
+                </button>
+              </div>
+              <p className="text-white text-xl mb-2 font-medium">
+                {selectedClient.name}
+              </p>
+              <p className="text-subtitle text-sm mb-6">
+                Enter your terminal location to continue
+              </p>
+              <form onSubmit={handleTerminalSubmit} className="relative">
+                <div className="relative">
+                  <MapPin className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
+                  <input
+                    type="text"
+                    value={terminalInput}
+                    onChange={(e) => {
+                      setTerminalInput(e.target.value);
+                      setError("");
+                    }}
+                    placeholder="Enter terminal location..."
+                    className="search-input"
+                    autoFocus
+                  />
+                </div>
+                {error && (
+                  <p className="mt-3 text-red-400 text-sm">{error}</p>
+                )}
+                <button
+                  type="submit"
+                  className="mt-6 px-10 py-3 bg-white text-gray-900 rounded-full font-medium hover:bg-gray-100 transition-colors"
+                >
+                  Continue
+                </button>
+              </form>
             </div>
           )}
 
