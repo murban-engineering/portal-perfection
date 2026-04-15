@@ -23,6 +23,7 @@ const Portal = () => {
   const [password, setPassword] = useState("");
   const [step, setStep] = useState<Step>("search");
   const [error, setError] = useState("");
+  const [terminalInput, setTerminalInput] = useState("");
 
   // Reset password state
   const [resetClient, setResetClient] = useState<Client | null>(null);
@@ -41,7 +42,7 @@ const Portal = () => {
     }
 
     const { data, error } = await supabase.from("clients").select("*");
-    if (data) setClients(data);
+    if (data) setClients(data as Client[]);
     if (error) console.error("Error fetching clients:", error);
   };
 
@@ -59,10 +60,25 @@ const Portal = () => {
 
   const handleSelectClient = (client: Client) => {
     setSelectedClient(client);
-    setStep("password");
+    if (client.terminal_location) {
+      setStep("terminal");
+      setTerminalInput("");
+    } else {
+      setStep("password");
+    }
     setPassword("");
     setError("");
     setSearchTerm("");
+  };
+
+  const handleTerminalSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (selectedClient && terminalInput.trim().toLowerCase() === selectedClient.terminal_location?.toLowerCase()) {
+      setStep("password");
+      setError("");
+    } else {
+      setError("Incorrect terminal location. Please try again.");
+    }
   };
 
   const handlePasswordSubmit = (e: React.FormEvent) => {
