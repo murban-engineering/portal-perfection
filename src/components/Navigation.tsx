@@ -43,13 +43,8 @@ const Navigation = () => {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 px-2 md:px-6 py-1 md:py-4">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 px-3 md:px-0 py-1 md:py-0">
-        <Link to="/" className="flex items-center gap-2 md:gap-3 min-w-0">
+        <Link to="/" className="flex items-center min-w-0">
           <Logo />
-          <span className="text-white text-[15px] md:text-xl font-semibold md:font-bold tracking-wide leading-tight">
-            Murban
-            <br className="md:hidden" />
-            Engineering
-          </span>
         </Link>
         
         <div ref={navRef}>
