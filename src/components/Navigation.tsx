@@ -46,12 +46,21 @@ const Navigation = () => {
         <Link to="/" className="flex items-center gap-2 md:gap-3 min-w-0">
           <Logo />
           <span
-            className="text-white text-[15px] md:text-xl font-bold tracking-[0.12em] leading-tight uppercase"
-            style={{ fontFamily: "'Orbitron', system-ui, sans-serif" }}
+            className="flex flex-col leading-none"
+            style={{ fontFamily: "'Montserrat', system-ui, sans-serif" }}
           >
-            Murban
-            <br className="md:hidden" />
-            Engineering
+            <span
+              className="text-[18px] md:text-2xl font-extrabold tracking-tight"
+              style={{ color: 'hsl(var(--logo-red))' }}
+            >
+              MURBAN
+            </span>
+            <span
+              className="text-[9px] md:text-[11px] font-medium tracking-[0.32em] mt-0.5"
+              style={{ color: 'hsl(var(--logo-blue))' }}
+            >
+              ENGINEERING
+            </span>
           </span>
         </Link>
         
