@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Search, Lock, ArrowLeft, KeyRound, MapPin } from "lucide-react";
 import Layout from "@/components/Layout";
-const heroImage = "/portal-bg.jpg";
+import heroImage from "@/assets/hero-industrial.jpg";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
