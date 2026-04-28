@@ -47,17 +47,17 @@ const Navigation = () => {
           <Logo />
           <span
             className="flex flex-col leading-none"
-            style={{ fontFamily: "'Montserrat', system-ui, sans-serif" }}
+            style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
           >
             <span
               className="text-[18px] md:text-2xl font-extrabold tracking-tight"
-              style={{ color: 'hsl(var(--logo-red))' }}
+              style={{ color: "#A60D0F" }}
             >
               MURBAN
             </span>
             <span
               className="text-[9px] md:text-[11px] font-medium tracking-[0.32em] mt-0.5"
-              style={{ color: 'hsl(var(--logo-blue))' }}
+              style={{ color: "#213164" }}
             >
               ENGINEERING
             </span>
