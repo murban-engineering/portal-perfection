@@ -53,7 +53,7 @@ const Navigation = () => {
               className="text-[18px] md:text-2xl font-extrabold tracking-tight"
               style={{ color: "#A60D0F" }}
             >
-              MURBAN
+              murban
             </span>
             <span
               className="text-[9px] md:text-[11px] font-medium tracking-[0.32em] mt-0.5"
