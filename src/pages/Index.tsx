@@ -27,10 +27,7 @@ const Index = () => {
         
         {/* Content */}
         <div className="relative z-10 text-center px-6 animate-fade-in">
-          <h1 className="hero-title mb-8">
-            murban
-            ENGINEERING
-          </h1>
+          <h1 className="hero-title mb-8"><span className="lowercase">murban</span> <span className="uppercase">ENGINEERING</span></h1>
           
           <p className="hero-subtitle mb-16">
             Industrial Engineering Solutions & Client Resources Portal
