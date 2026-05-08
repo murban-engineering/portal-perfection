@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import Layout from "@/components/Layout";
+import BrandWordmark from "@/components/BrandWordmark";
 const heroImage = "/aerial-view-gas-oil-refinery-oil-industry.jpg";
 
 const Index = () => {
@@ -27,7 +28,12 @@ const Index = () => {
         
         {/* Content */}
         <div className="relative z-10 text-center px-6 animate-fade-in">
-          <h1 className="hero-title mb-8"><span className="lowercase">murban</span> <span className="uppercase">ENGINEERING</span></h1>
+          <h1 className="hero-title mb-8">
+            <BrandWordmark
+              murbanClassName="text-5xl md:text-7xl lg:text-8xl tracking-[0.06em]"
+              engineeringClassName="text-lg md:text-2xl lg:text-3xl tracking-[0.45em] mt-3 pl-[0.45em]"
+            />
+          </h1>
           
           <p className="hero-subtitle mb-16">
             Industrial Engineering Solutions & Client Resources Portal

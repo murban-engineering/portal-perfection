@@ -219,7 +219,7 @@ const Portal = () => {
           <h1 className="portal-title mb-6">Secure Client Portal</h1>
 
           <p className="hero-subtitle mb-12">
-            Search your company, enter your passkey, and launch your murban app
+            Search your company, enter your passkey, and launch your MURBAN ENGINEERING LTD app
             securely.
           </p>
 
