@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Search, Lock, ArrowLeft, KeyRound, MapPin } from "lucide-react";
 import Layout from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,6 +25,9 @@ const Portal = () => {
   const [step, setStep] = useState<Step>("search");
   const [error, setError] = useState("");
   const [terminalInput, setTerminalInput] = useState("");
+  const terminalInputRef = useRef<HTMLInputElement>(null);
+  const passwordInputRef = useRef<HTMLInputElement>(null);
+  const resetCurrentPasswordRef = useRef<HTMLInputElement>(null);
 
   // Reset password state
   const [resetClient, setResetClient] = useState<Client | null>(null);
@@ -35,6 +38,20 @@ const Portal = () => {
   useEffect(() => {
     fetchClients();
   }, []);
+
+  useEffect(() => {
+    if (step === "terminal") {
+      terminalInputRef.current?.focus();
+    }
+
+    if (step === "password") {
+      passwordInputRef.current?.focus();
+    }
+
+    if (step === "reset") {
+      resetCurrentPasswordRef.current?.focus();
+    }
+  }, [step]);
 
   const fetchClients = async () => {
     if (!supabase) {
@@ -233,7 +250,7 @@ const Portal = () => {
             <div>
               {/* Search Input */}
               <div className="relative">
-                <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
+                <Search className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
                 <input
                   type="text"
                   value={searchTerm}
@@ -296,8 +313,9 @@ const Portal = () => {
               </p>
               <form onSubmit={handleTerminalSubmit} className="relative">
                 <div className="relative">
-                  <MapPin className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
+                  <MapPin className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
                   <input
+                    ref={terminalInputRef}
                     type="text"
                     value={terminalInput}
                     onChange={(e) => {
@@ -337,8 +355,9 @@ const Portal = () => {
               </p>
               <form onSubmit={handlePasswordSubmit} className="relative">
                 <div className="relative">
-                  <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
+                  <Lock className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
                   <input
+                    ref={passwordInputRef}
                     type="password"
                     value={password}
                     onChange={(e) => {
@@ -347,6 +366,8 @@ const Portal = () => {
                     }}
                     placeholder="Enter your passkey"
                     className="search-input"
+                    autoComplete="current-password"
+                    name="client-portal-password"
                     autoFocus
                   />
                 </div>
@@ -384,8 +405,9 @@ const Portal = () => {
                 className="space-y-4 max-w-md mx-auto"
               >
                 <div className="relative">
-                  <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <Lock className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
+                    ref={resetCurrentPasswordRef}
                     type="password"
                     value={currentPassword}
                     onChange={(e) => {
@@ -394,11 +416,13 @@ const Portal = () => {
                     }}
                     placeholder="Current password"
                     className="search-input text-base"
+                    autoComplete="current-password"
+                    name="current-password"
                     autoFocus
                   />
                 </div>
                 <div className="relative">
-                  <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <Lock className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
                     type="password"
                     value={newPassword}
@@ -408,10 +432,12 @@ const Portal = () => {
                     }}
                     placeholder="New password"
                     className="search-input text-base"
+                    autoComplete="new-password"
+                    name="new-password"
                   />
                 </div>
                 <div className="relative">
-                  <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <Lock className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
                     type="password"
                     value={confirmPassword}
@@ -421,6 +447,8 @@ const Portal = () => {
                     }}
                     placeholder="Confirm new password"
                     className="search-input text-base"
+                    autoComplete="new-password"
+                    name="confirm-new-password"
                   />
                 </div>
                 {error && (
