@@ -30,8 +30,8 @@ const Index = () => {
         <div className="relative z-10 text-center px-6 animate-fade-in">
           <h1 className="hero-title mb-8">
             <BrandWordmark
-              murbanClassName="text-5xl md:text-7xl lg:text-8xl tracking-[0.06em]"
-              engineeringClassName="text-lg md:text-2xl lg:text-3xl tracking-[0.45em] mt-3 pl-[0.45em]"
+              murbanClassName="text-5xl md:text-7xl lg:text-8xl tracking-[0.02em]"
+              engineeringClassName="mt-4 text-base md:text-2xl lg:text-3xl tracking-[0.34em]"
             />
           </h1>
           
