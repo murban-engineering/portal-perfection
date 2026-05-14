@@ -11,19 +11,18 @@ const BrandWordmark = ({
 }: BrandWordmarkProps) => {
   return (
     <span
-      className={`inline-flex flex-col leading-none uppercase ${className}`}
-      aria-label="MURBAN ENGINEERING LIMITED"
-      style={{ fontFamily: "'Montserrat', 'Inter', system-ui, sans-serif" }}
+      className={`brand-wordmark inline-flex flex-col leading-none uppercase ${className}`}
+      aria-label="MURBAN ENGINEERING LTD"
     >
       <span
-        className={`font-extrabold text-[#A60D0F] ${murbanClassName}`}
+        className={`brand-wordmark__murban font-bold text-[#A60D0F] ${murbanClassName}`}
       >
         MURBAN
       </span>
       <span
-        className={`font-medium text-[#213164] ${engineeringClassName}`}
+        className={`brand-wordmark__engineering font-light text-[#213164] ${engineeringClassName}`}
       >
-        ENGINEERING LIMITED
+        ENGINEERING LTD
       </span>
     </span>
   );
