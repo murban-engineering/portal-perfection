@@ -30,9 +30,8 @@ const Index = () => {
         <div className="relative z-10 text-center px-6 animate-fade-in">
           <h1 className="hero-title mb-8">
             <BrandWordmark
-              variant="hero"
-              murbanClassName="text-6xl md:text-8xl lg:text-9xl text-[#A60D0F]"
-              engineeringClassName="text-[0.68rem] sm:text-sm md:text-xl lg:text-2xl tracking-[0.32em] md:tracking-[0.45em] text-[#213164] mt-4 px-5 sm:px-7 md:px-9 py-2.5 md:py-3 pl-[calc(1.25rem+0.32em)] sm:pl-[calc(1.75rem+0.32em)] md:pl-[calc(2.25rem+0.45em)]"
+              murbanClassName="text-5xl md:text-7xl lg:text-8xl tracking-[0.06em]"
+              engineeringClassName="text-lg md:text-2xl lg:text-3xl tracking-[0.45em] mt-3 pl-[0.45em]"
             />
           </h1>
           
