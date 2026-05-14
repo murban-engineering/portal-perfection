@@ -79,17 +79,18 @@
 
 @layer components {
   .brand-wordmark {
-    font-family: 'Montserrat', 'Futura', 'Avenir Next Condensed', 'Arial Narrow', system-ui, sans-serif;
+    font-family: 'Oswald', 'Futura Condensed Extra Bold', 'Futura', 'Eurostile', 'Trade Gothic Condensed', 'Arial Narrow', system-ui, sans-serif;
+    font-stretch: condensed;
   }
 
   .brand-wordmark__murban {
-    letter-spacing: 0.02em;
-    line-height: 0.9;
+    letter-spacing: 0.035em;
+    transform: scaleX(0.9);
+    transform-origin: left center;
   }
 
   .brand-wordmark__engineering {
-    letter-spacing: 0.34em;
-    line-height: 1;
+    letter-spacing: 0.26em;
   }
 
   .nav-pill {
