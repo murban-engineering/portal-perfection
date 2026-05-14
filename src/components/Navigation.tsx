@@ -48,7 +48,7 @@ const Navigation = () => {
           <Logo />
           <BrandWordmark
             murbanClassName="text-[18px] md:text-2xl tracking-[0.02em]"
-            engineeringClassName="mt-1 text-[5px] md:text-[8px] tracking-[0.18em] md:tracking-[0.26em]"
+            engineeringClassName="text-[6px] md:text-[9px] tracking-[0.18em] md:tracking-[0.26em] mt-0.5"
           />
         </Link>
         
