@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;700;800;900&family=Oswald:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;700;800;900&family=Oswald:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -83,14 +83,42 @@
     font-stretch: condensed;
   }
 
+  .brand-wordmark--hero {
+    align-items: center;
+    font-family: 'Montserrat', system-ui, sans-serif;
+    font-stretch: normal;
+  }
+
   .brand-wordmark__murban {
     letter-spacing: 0.035em;
     transform: scaleX(0.9);
     transform-origin: left center;
   }
 
+  .brand-wordmark--hero .brand-wordmark__murban {
+    font-family: 'Anton', 'Impact', 'Arial Narrow', system-ui, sans-serif;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    line-height: 0.92;
+    text-shadow: 0 6px 18px hsla(220, 20%, 6%, 0.45);
+    transform: none;
+  }
+
   .brand-wordmark__engineering {
     letter-spacing: 0.26em;
+  }
+
+  .brand-wordmark--hero .brand-wordmark__engineering {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid hsl(226 50% 26% / 0.24);
+    border-radius: 9999px;
+    background: hsl(0 0% 100% / 0.82);
+    box-shadow: 0 12px 30px hsl(220 20% 6% / 0.25);
+    font-family: 'Montserrat', system-ui, sans-serif;
+    font-weight: 700;
+    line-height: 1;
   }
 
   .nav-pill {
