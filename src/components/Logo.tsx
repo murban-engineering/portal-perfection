@@ -1,8 +1,8 @@
-import logoImg from "@/assets/murbanlogo.ico";
+import logoImg from "@/assets/murbanlogofinal_branding.png.asset.json";
 
 const Logo = () => {
   return (
-    <img src={logoImg} alt="MURBAN ENGINEERING LTD logo mark" className="w-9 h-9 md:w-10 md:h-10 object-contain shrink-0" />
+    <img src={logoImg.url} alt="MURBAN ENGINEERING LTD logo mark" className="h-10 md:h-12 w-auto object-contain shrink-0" />
   );
 };
 

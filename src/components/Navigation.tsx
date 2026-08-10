@@ -1,7 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useRef, useEffect, useState } from "react";
 import Logo from "./Logo";
-import BrandWordmark from "./BrandWordmark";
 
 const Navigation = () => {
   const location = useLocation();
