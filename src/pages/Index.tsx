@@ -28,11 +28,11 @@ const Index = () => {
         
         {/* Content */}
         <div className="relative z-10 text-center px-6 animate-fade-in">
-          <h1 className="mb-8 -mx-6">
+          <h1 className="mb-8 flex justify-center">
             <img
               src={logoTextImage}
               alt="MURBAN ENGINEERING"
-              className="w-full max-w-[16rem] h-auto drop-shadow-lg"
+              className="w-full max-w-[min(34rem,92vw)] h-auto drop-shadow-lg"
             />
           </h1>
           
