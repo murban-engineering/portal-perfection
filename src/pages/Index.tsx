@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import Layout from "@/components/Layout";
 const heroImage = "/aerial-view-gas-oil-refinery-oil-industry.jpg";
-const logoTextImage = "/murban-text-logo.png";
+const logoTextImage = "/MURBANLOGOFINAL%20TODAY.png";
 
 const Index = () => {
   return (
@@ -32,7 +32,7 @@ const Index = () => {
             <img
               src={logoTextImage}
               alt="MURBAN ENGINEERING"
-              className="w-full h-auto drop-shadow-lg"
+              className="w-full max-w-5xl h-auto drop-shadow-lg"
             />
           </h1>
           
