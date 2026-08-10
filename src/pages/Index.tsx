@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import Layout from "@/components/Layout";
-import BrandWordmark from "@/components/BrandWordmark";
 const heroImage = "/aerial-view-gas-oil-refinery-oil-industry.jpg";
+const logoTextImage = "/murban-text-logo.png";
 
 const Index = () => {
   return (
