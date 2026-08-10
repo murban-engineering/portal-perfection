@@ -32,7 +32,7 @@ const Index = () => {
             <img
               src={logoTextImage}
               alt="MURBAN ENGINEERING"
-              className="w-auto max-w-[85vw] md:max-w-[65vw] lg:max-w-[55vw] mx-auto drop-shadow-lg"
+              className="w-auto max-w-[95vw] md:max-w-[85vw] lg:max-w-[75vw] mx-auto drop-shadow-lg"
             />
           </h1>
           
