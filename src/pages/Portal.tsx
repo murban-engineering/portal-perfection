@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Search, Lock, ArrowLeft, KeyRound, MapPin } from "lucide-react";
+import { Search, Lock, ArrowLeft, KeyRound, MapPin, Shield, LogOut, ExternalLink } from "lucide-react";
 import Layout from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -14,7 +14,7 @@ interface Client {
   terminal_location: string | null;
 }
 
-type Step = "search" | "terminal" | "password" | "app" | "reset";
+type Step = "search" | "terminal" | "password" | "app" | "reset" | "admin-login" | "admin-list" | "admin-reset";
 
 const Portal = () => {
   const [clients, setClients] = useState<Client[]>([]);
@@ -28,12 +28,23 @@ const Portal = () => {
   const terminalInputRef = useRef<HTMLInputElement>(null);
   const passwordInputRef = useRef<HTMLInputElement>(null);
   const resetCurrentPasswordRef = useRef<HTMLInputElement>(null);
+  const adminPasswordRef = useRef<HTMLInputElement>(null);
+
+  // Admin state
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [enteredAsAdmin, setEnteredAsAdmin] = useState(false);
+  const [adminPassword, setAdminPassword] = useState("");
+  const [adminFilter, setAdminFilter] = useState("");
+  const [adminCurrentPassword, setAdminCurrentPassword] = useState("");
+  const [adminNewPassword, setAdminNewPassword] = useState("");
+  const [adminConfirmPassword, setAdminConfirmPassword] = useState("");
 
   // Reset password state
   const [resetClient, setResetClient] = useState<Client | null>(null);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
 
   useEffect(() => {
     fetchClients();
