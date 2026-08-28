@@ -321,13 +321,33 @@ const Portal = () => {
     return (
       <Layout>
         <div className="fixed inset-x-0 bottom-0 top-24 z-40 bg-background">
+          {enteredAsAdmin && (
+            <div className="flex items-center justify-between gap-3 border-b border-white/10 bg-secondary/60 px-4 py-2">
+              <button
+                onClick={handleBack}
+                className="flex items-center gap-2 text-xs font-semibold text-muted-foreground transition-colors hover:text-white"
+              >
+                <ArrowLeft className="h-4 w-4" /> All clients
+              </button>
+              <span className="truncate text-xs font-semibold text-white">
+                {selectedClient.name}
+              </span>
+              <button
+                onClick={handleAdminLogout}
+                className="flex items-center gap-2 text-xs font-semibold text-muted-foreground transition-colors hover:text-white"
+              >
+                <LogOut className="h-4 w-4" /> Log out
+              </button>
+            </div>
+          )}
           <iframe
             src={selectedClient.app_url}
-            className="h-full w-full border-0"
+            className={enteredAsAdmin ? "h-[calc(100%-2.5rem)] w-full border-0" : "h-full w-full border-0"}
             title={selectedClient.name}
             allow="fullscreen"
           />
         </div>
+
       </Layout>
     );
   }
