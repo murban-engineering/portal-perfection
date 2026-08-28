@@ -440,8 +440,204 @@ const Portal = () => {
                   No companies found matching "{searchTerm}"
                 </p>
               )}
+
+              <button
+                onClick={() => {
+                  setStep(isAdmin ? "admin-list" : "admin-login");
+                  setError("");
+                  setSearchTerm("");
+                }}
+                className="mx-auto mt-8 flex items-center gap-2 text-sm font-semibold text-subtitle transition-colors hover:text-white"
+              >
+                <Shield className="h-4 w-4" />
+                Login as Admin
+              </button>
             </div>
           )}
+
+          {step === "admin-login" && (
+            <div>
+              <div className="mb-6">
+                <button
+                  onClick={handleBack}
+                  className="text-subtitle hover:text-white transition-colors text-sm flex items-center gap-2 mx-auto"
+                >
+                  <ArrowLeft className="w-4 h-4" /> Back to search
+                </button>
+              </div>
+              <p className="text-white text-xl mb-2 font-medium">Admin Access</p>
+              <p className="text-subtitle text-sm mb-6">
+                Enter the admin passkey to view all client apps
+              </p>
+              <form onSubmit={handleAdminLogin} className="relative max-w-md mx-auto">
+                <div className="relative">
+                  <Shield className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
+                  <input
+                    ref={adminPasswordRef}
+                    type="password"
+                    value={adminPassword}
+                    onChange={(e) => {
+                      setAdminPassword(e.target.value);
+                      setError("");
+                    }}
+                    placeholder="Admin passkey"
+                    className="search-input"
+                    autoComplete="current-password"
+                    name="admin-passkey"
+                  />
+                </div>
+                {error && <p className="mt-3 text-red-400 text-sm">{error}</p>}
+                <button
+                  type="submit"
+                  className="mt-6 px-10 py-3 bg-white text-gray-900 rounded-full font-medium hover:bg-gray-100 transition-colors"
+                >
+                  Sign In
+                </button>
+              </form>
+            </div>
+          )}
+
+          {step === "admin-list" && (
+            <div>
+              <div className="mb-6 flex items-center justify-between gap-3">
+                <button
+                  onClick={handleAdminLogout}
+                  className="text-subtitle hover:text-white transition-colors text-sm flex items-center gap-2"
+                >
+                  <LogOut className="w-4 h-4" /> Log out
+                </button>
+                <button
+                  onClick={() => {
+                    setStep("admin-reset");
+                    setError("");
+                  }}
+                  className="text-subtitle hover:text-white transition-colors text-sm flex items-center gap-2"
+                >
+                  <KeyRound className="w-4 h-4" /> Change admin passkey
+                </button>
+              </div>
+
+              <p className="text-white text-xl mb-2 font-medium">All Clients</p>
+              <p className="text-subtitle text-sm mb-6">
+                {clients.length} client app{clients.length === 1 ? "" : "s"} available
+              </p>
+
+              <div className="relative mb-4">
+                <Search className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
+                <input
+                  type="text"
+                  value={adminFilter}
+                  onChange={(e) => setAdminFilter(e.target.value)}
+                  placeholder="Filter clients..."
+                  className="search-input"
+                />
+              </div>
+
+              <div className="max-h-[50vh] overflow-y-auto rounded-2xl bg-white text-left shadow-lg">
+                {clients
+                  .filter((c) =>
+                    c.name.toLowerCase().includes(adminFilter.trim().toLowerCase())
+                  )
+                  .map((client) => (
+                    <div
+                      key={client.id}
+                      className="flex items-center justify-between gap-4 border-b border-gray-100 px-6 py-4 last:border-0 hover:bg-gray-50"
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate font-medium text-gray-900">{client.name}</p>
+                        {client.terminal_location && (
+                          <p className="mt-0.5 flex items-center gap-1 text-xs text-gray-500">
+                            <MapPin className="h-3 w-3" />
+                            {client.terminal_location}
+                          </p>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => handleAdminOpenClient(client)}
+                        className="flex shrink-0 items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-90"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                        Open
+                      </button>
+                    </div>
+                  ))}
+                {clients.filter((c) =>
+                  c.name.toLowerCase().includes(adminFilter.trim().toLowerCase())
+                ).length === 0 && (
+                  <p className="px-6 py-6 text-sm text-gray-500">No clients found.</p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {step === "admin-reset" && (
+            <div>
+              <div className="mb-6">
+                <button
+                  onClick={handleBack}
+                  className="text-subtitle hover:text-white transition-colors text-sm flex items-center gap-2 mx-auto"
+                >
+                  <ArrowLeft className="w-4 h-4" /> Back to all clients
+                </button>
+              </div>
+              <p className="text-white text-xl mb-6 font-medium">Change Admin Passkey</p>
+              <form onSubmit={handleAdminPasswordChange} className="space-y-4 max-w-md mx-auto">
+                <div className="relative">
+                  <Lock className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="password"
+                    value={adminCurrentPassword}
+                    onChange={(e) => {
+                      setAdminCurrentPassword(e.target.value);
+                      setError("");
+                    }}
+                    placeholder="Current admin passkey"
+                    className="search-input text-base"
+                    autoComplete="current-password"
+                    name="admin-current-password"
+                  />
+                </div>
+                <div className="relative">
+                  <Lock className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="password"
+                    value={adminNewPassword}
+                    onChange={(e) => {
+                      setAdminNewPassword(e.target.value);
+                      setError("");
+                    }}
+                    placeholder="New admin passkey"
+                    className="search-input text-base"
+                    autoComplete="new-password"
+                    name="admin-new-password"
+                  />
+                </div>
+                <div className="relative">
+                  <Lock className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="password"
+                    value={adminConfirmPassword}
+                    onChange={(e) => {
+                      setAdminConfirmPassword(e.target.value);
+                      setError("");
+                    }}
+                    placeholder="Confirm new passkey"
+                    className="search-input text-base"
+                    autoComplete="new-password"
+                    name="admin-confirm-password"
+                  />
+                </div>
+                {error && <p className="text-red-400 text-sm">{error}</p>}
+                <button
+                  type="submit"
+                  className="w-full py-3 bg-white text-gray-900 rounded-full font-medium hover:bg-gray-100 transition-colors"
+                >
+                  Update Passkey
+                </button>
+              </form>
+            </div>
+          )}
+
 
           {step === "terminal" && selectedClient && (
             <div>
