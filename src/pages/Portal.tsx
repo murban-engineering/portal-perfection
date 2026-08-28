@@ -62,7 +62,12 @@ const Portal = () => {
     if (step === "reset") {
       resetCurrentPasswordRef.current?.focus();
     }
+
+    if (step === "admin-login") {
+      adminPasswordRef.current?.focus();
+    }
   }, [step]);
+
 
   const fetchClients = async () => {
     if (!supabase) {
