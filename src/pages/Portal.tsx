@@ -94,6 +94,7 @@ const Portal = () => {
 
   const handleSelectClient = (client: Client) => {
     setSelectedClient(client);
+    setEnteredAsAdmin(false);
     if (client.terminal_location) {
       setStep("terminal");
       setTerminalInput("");
@@ -125,6 +126,101 @@ const Portal = () => {
     }
   };
 
+  const handleAdminLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!supabase) {
+      setError("Portal database is not configured.");
+      return;
+    }
+
+    const { data, error: adminError } = await supabase
+      .from("admin_settings")
+      .select("password")
+      .limit(1)
+      .maybeSingle();
+
+    if (adminError || !data) {
+      setError("Unable to verify admin access. Please try again.");
+      return;
+    }
+
+    if (adminPassword === data.password) {
+      setIsAdmin(true);
+      setAdminPassword("");
+      setAdminFilter("");
+      setError("");
+      setStep("admin-list");
+    } else {
+      setError("Incorrect admin passkey.");
+    }
+  };
+
+  const handleAdminOpenClient = (client: Client) => {
+    setSelectedClient(client);
+    setEnteredAsAdmin(true);
+    setError("");
+    setStep("app");
+  };
+
+  const handleAdminLogout = () => {
+    setIsAdmin(false);
+    setEnteredAsAdmin(false);
+    setSelectedClient(null);
+    setAdminPassword("");
+    setAdminFilter("");
+    setError("");
+    setStep("search");
+  };
+
+  const handleAdminPasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!supabase) {
+      setError("Portal database is not configured.");
+      return;
+    }
+
+    const { data, error: fetchError } = await supabase
+      .from("admin_settings")
+      .select("id, password")
+      .limit(1)
+      .maybeSingle();
+
+    if (fetchError || !data) {
+      setError("Unable to load admin settings. Please try again.");
+      return;
+    }
+
+    if (adminCurrentPassword !== data.password) {
+      setError("Current admin passkey is incorrect.");
+      return;
+    }
+    if (adminNewPassword.trim().length < 4) {
+      setError("New passkey must be at least 4 characters.");
+      return;
+    }
+    if (adminNewPassword !== adminConfirmPassword) {
+      setError("New passkeys do not match.");
+      return;
+    }
+
+    const { error: updateError } = await supabase
+      .from("admin_settings")
+      .update({ password: adminNewPassword })
+      .eq("id", data.id);
+
+    if (updateError) {
+      setError("Failed to update admin passkey. Please try again.");
+      return;
+    }
+
+    toast.success("Admin passkey updated successfully!");
+    setAdminCurrentPassword("");
+    setAdminNewPassword("");
+    setAdminConfirmPassword("");
+    setError("");
+    setStep("admin-list");
+  };
+
   const handleBack = () => {
     if (step === "terminal") {
       setStep("search");
@@ -142,16 +238,32 @@ const Portal = () => {
       setPassword("");
       setError("");
     } else if (step === "app") {
-      setStep("password");
-      setPassword("");
+      if (enteredAsAdmin) {
+        setStep("admin-list");
+        setSelectedClient(null);
+      } else {
+        setStep("password");
+        setPassword("");
+      }
     } else if (step === "reset") {
       setStep("search");
       setResetClient(null);
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
+    } else if (step === "admin-login") {
+      setStep("search");
+      setAdminPassword("");
+      setError("");
+    } else if (step === "admin-reset") {
+      setStep("admin-list");
+      setAdminCurrentPassword("");
+      setAdminNewPassword("");
+      setAdminConfirmPassword("");
+      setError("");
     }
   };
+
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
