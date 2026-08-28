@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Search, Lock, ArrowLeft, KeyRound, MapPin } from "lucide-react";
+import { Search, Lock, ArrowLeft, KeyRound, MapPin, Shield, LogOut, ExternalLink } from "lucide-react";
 import Layout from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -14,7 +14,7 @@ interface Client {
   terminal_location: string | null;
 }
 
-type Step = "search" | "terminal" | "password" | "app" | "reset";
+type Step = "search" | "terminal" | "password" | "app" | "reset" | "admin-login" | "admin-list" | "admin-reset";
 
 const Portal = () => {
   const [clients, setClients] = useState<Client[]>([]);
@@ -28,12 +28,23 @@ const Portal = () => {
   const terminalInputRef = useRef<HTMLInputElement>(null);
   const passwordInputRef = useRef<HTMLInputElement>(null);
   const resetCurrentPasswordRef = useRef<HTMLInputElement>(null);
+  const adminPasswordRef = useRef<HTMLInputElement>(null);
+
+  // Admin state
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [enteredAsAdmin, setEnteredAsAdmin] = useState(false);
+  const [adminPassword, setAdminPassword] = useState("");
+  const [adminFilter, setAdminFilter] = useState("");
+  const [adminCurrentPassword, setAdminCurrentPassword] = useState("");
+  const [adminNewPassword, setAdminNewPassword] = useState("");
+  const [adminConfirmPassword, setAdminConfirmPassword] = useState("");
 
   // Reset password state
   const [resetClient, setResetClient] = useState<Client | null>(null);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
 
   useEffect(() => {
     fetchClients();
@@ -51,7 +62,12 @@ const Portal = () => {
     if (step === "reset") {
       resetCurrentPasswordRef.current?.focus();
     }
+
+    if (step === "admin-login") {
+      adminPasswordRef.current?.focus();
+    }
   }, [step]);
+
 
   const fetchClients = async () => {
     if (!supabase) {
@@ -78,6 +94,7 @@ const Portal = () => {
 
   const handleSelectClient = (client: Client) => {
     setSelectedClient(client);
+    setEnteredAsAdmin(false);
     if (client.terminal_location) {
       setStep("terminal");
       setTerminalInput("");
@@ -109,6 +126,101 @@ const Portal = () => {
     }
   };
 
+  const handleAdminLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!supabase) {
+      setError("Portal database is not configured.");
+      return;
+    }
+
+    const { data, error: adminError } = await supabase
+      .from("admin_settings")
+      .select("password")
+      .limit(1)
+      .maybeSingle();
+
+    if (adminError || !data) {
+      setError("Unable to verify admin access. Please try again.");
+      return;
+    }
+
+    if (adminPassword === data.password) {
+      setIsAdmin(true);
+      setAdminPassword("");
+      setAdminFilter("");
+      setError("");
+      setStep("admin-list");
+    } else {
+      setError("Incorrect admin passkey.");
+    }
+  };
+
+  const handleAdminOpenClient = (client: Client) => {
+    setSelectedClient(client);
+    setEnteredAsAdmin(true);
+    setError("");
+    setStep("app");
+  };
+
+  const handleAdminLogout = () => {
+    setIsAdmin(false);
+    setEnteredAsAdmin(false);
+    setSelectedClient(null);
+    setAdminPassword("");
+    setAdminFilter("");
+    setError("");
+    setStep("search");
+  };
+
+  const handleAdminPasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!supabase) {
+      setError("Portal database is not configured.");
+      return;
+    }
+
+    const { data, error: fetchError } = await supabase
+      .from("admin_settings")
+      .select("id, password")
+      .limit(1)
+      .maybeSingle();
+
+    if (fetchError || !data) {
+      setError("Unable to load admin settings. Please try again.");
+      return;
+    }
+
+    if (adminCurrentPassword !== data.password) {
+      setError("Current admin passkey is incorrect.");
+      return;
+    }
+    if (adminNewPassword.trim().length < 4) {
+      setError("New passkey must be at least 4 characters.");
+      return;
+    }
+    if (adminNewPassword !== adminConfirmPassword) {
+      setError("New passkeys do not match.");
+      return;
+    }
+
+    const { error: updateError } = await supabase
+      .from("admin_settings")
+      .update({ password: adminNewPassword })
+      .eq("id", data.id);
+
+    if (updateError) {
+      setError("Failed to update admin passkey. Please try again.");
+      return;
+    }
+
+    toast.success("Admin passkey updated successfully!");
+    setAdminCurrentPassword("");
+    setAdminNewPassword("");
+    setAdminConfirmPassword("");
+    setError("");
+    setStep("admin-list");
+  };
+
   const handleBack = () => {
     if (step === "terminal") {
       setStep("search");
@@ -126,16 +238,32 @@ const Portal = () => {
       setPassword("");
       setError("");
     } else if (step === "app") {
-      setStep("password");
-      setPassword("");
+      if (enteredAsAdmin) {
+        setStep("admin-list");
+        setSelectedClient(null);
+      } else {
+        setStep("password");
+        setPassword("");
+      }
     } else if (step === "reset") {
       setStep("search");
       setResetClient(null);
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
+    } else if (step === "admin-login") {
+      setStep("search");
+      setAdminPassword("");
+      setError("");
+    } else if (step === "admin-reset") {
+      setStep("admin-list");
+      setAdminCurrentPassword("");
+      setAdminNewPassword("");
+      setAdminConfirmPassword("");
+      setError("");
     }
   };
+
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -193,13 +321,33 @@ const Portal = () => {
     return (
       <Layout>
         <div className="fixed inset-x-0 bottom-0 top-24 z-40 bg-background">
+          {enteredAsAdmin && (
+            <div className="flex items-center justify-between gap-3 border-b border-white/10 bg-secondary/60 px-4 py-2">
+              <button
+                onClick={handleBack}
+                className="flex items-center gap-2 text-xs font-semibold text-muted-foreground transition-colors hover:text-white"
+              >
+                <ArrowLeft className="h-4 w-4" /> All clients
+              </button>
+              <span className="truncate text-xs font-semibold text-white">
+                {selectedClient.name}
+              </span>
+              <button
+                onClick={handleAdminLogout}
+                className="flex items-center gap-2 text-xs font-semibold text-muted-foreground transition-colors hover:text-white"
+              >
+                <LogOut className="h-4 w-4" /> Log out
+              </button>
+            </div>
+          )}
           <iframe
             src={selectedClient.app_url}
-            className="h-full w-full border-0"
+            className={enteredAsAdmin ? "h-[calc(100%-2.5rem)] w-full border-0" : "h-full w-full border-0"}
             title={selectedClient.name}
             allow="fullscreen"
           />
         </div>
+
       </Layout>
     );
   }
@@ -292,8 +440,204 @@ const Portal = () => {
                   No companies found matching "{searchTerm}"
                 </p>
               )}
+
+              <button
+                onClick={() => {
+                  setStep(isAdmin ? "admin-list" : "admin-login");
+                  setError("");
+                  setSearchTerm("");
+                }}
+                className="mx-auto mt-8 flex items-center gap-2 text-sm font-semibold text-subtitle transition-colors hover:text-white"
+              >
+                <Shield className="h-4 w-4" />
+                Login as Admin
+              </button>
             </div>
           )}
+
+          {step === "admin-login" && (
+            <div>
+              <div className="mb-6">
+                <button
+                  onClick={handleBack}
+                  className="text-subtitle hover:text-white transition-colors text-sm flex items-center gap-2 mx-auto"
+                >
+                  <ArrowLeft className="w-4 h-4" /> Back to search
+                </button>
+              </div>
+              <p className="text-white text-xl mb-2 font-medium">Admin Access</p>
+              <p className="text-subtitle text-sm mb-6">
+                Enter the admin passkey to view all client apps
+              </p>
+              <form onSubmit={handleAdminLogin} className="relative max-w-md mx-auto">
+                <div className="relative">
+                  <Shield className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
+                  <input
+                    ref={adminPasswordRef}
+                    type="password"
+                    value={adminPassword}
+                    onChange={(e) => {
+                      setAdminPassword(e.target.value);
+                      setError("");
+                    }}
+                    placeholder="Admin passkey"
+                    className="search-input"
+                    autoComplete="current-password"
+                    name="admin-passkey"
+                  />
+                </div>
+                {error && <p className="mt-3 text-red-400 text-sm">{error}</p>}
+                <button
+                  type="submit"
+                  className="mt-6 px-10 py-3 bg-white text-gray-900 rounded-full font-medium hover:bg-gray-100 transition-colors"
+                >
+                  Sign In
+                </button>
+              </form>
+            </div>
+          )}
+
+          {step === "admin-list" && (
+            <div>
+              <div className="mb-6 flex items-center justify-between gap-3">
+                <button
+                  onClick={handleAdminLogout}
+                  className="text-subtitle hover:text-white transition-colors text-sm flex items-center gap-2"
+                >
+                  <LogOut className="w-4 h-4" /> Log out
+                </button>
+                <button
+                  onClick={() => {
+                    setStep("admin-reset");
+                    setError("");
+                  }}
+                  className="text-subtitle hover:text-white transition-colors text-sm flex items-center gap-2"
+                >
+                  <KeyRound className="w-4 h-4" /> Change admin passkey
+                </button>
+              </div>
+
+              <p className="text-white text-xl mb-2 font-medium">All Clients</p>
+              <p className="text-subtitle text-sm mb-6">
+                {clients.length} client app{clients.length === 1 ? "" : "s"} available
+              </p>
+
+              <div className="relative mb-4">
+                <Search className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
+                <input
+                  type="text"
+                  value={adminFilter}
+                  onChange={(e) => setAdminFilter(e.target.value)}
+                  placeholder="Filter clients..."
+                  className="search-input"
+                />
+              </div>
+
+              <div className="max-h-[50vh] overflow-y-auto rounded-2xl bg-white text-left shadow-lg">
+                {clients
+                  .filter((c) =>
+                    c.name.toLowerCase().includes(adminFilter.trim().toLowerCase())
+                  )
+                  .map((client) => (
+                    <div
+                      key={client.id}
+                      className="flex items-center justify-between gap-4 border-b border-gray-100 px-6 py-4 last:border-0 hover:bg-gray-50"
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate font-medium text-gray-900">{client.name}</p>
+                        {client.terminal_location && (
+                          <p className="mt-0.5 flex items-center gap-1 text-xs text-gray-500">
+                            <MapPin className="h-3 w-3" />
+                            {client.terminal_location}
+                          </p>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => handleAdminOpenClient(client)}
+                        className="flex shrink-0 items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-90"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                        Open
+                      </button>
+                    </div>
+                  ))}
+                {clients.filter((c) =>
+                  c.name.toLowerCase().includes(adminFilter.trim().toLowerCase())
+                ).length === 0 && (
+                  <p className="px-6 py-6 text-sm text-gray-500">No clients found.</p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {step === "admin-reset" && (
+            <div>
+              <div className="mb-6">
+                <button
+                  onClick={handleBack}
+                  className="text-subtitle hover:text-white transition-colors text-sm flex items-center gap-2 mx-auto"
+                >
+                  <ArrowLeft className="w-4 h-4" /> Back to all clients
+                </button>
+              </div>
+              <p className="text-white text-xl mb-6 font-medium">Change Admin Passkey</p>
+              <form onSubmit={handleAdminPasswordChange} className="space-y-4 max-w-md mx-auto">
+                <div className="relative">
+                  <Lock className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="password"
+                    value={adminCurrentPassword}
+                    onChange={(e) => {
+                      setAdminCurrentPassword(e.target.value);
+                      setError("");
+                    }}
+                    placeholder="Current admin passkey"
+                    className="search-input text-base"
+                    autoComplete="current-password"
+                    name="admin-current-password"
+                  />
+                </div>
+                <div className="relative">
+                  <Lock className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="password"
+                    value={adminNewPassword}
+                    onChange={(e) => {
+                      setAdminNewPassword(e.target.value);
+                      setError("");
+                    }}
+                    placeholder="New admin passkey"
+                    className="search-input text-base"
+                    autoComplete="new-password"
+                    name="admin-new-password"
+                  />
+                </div>
+                <div className="relative">
+                  <Lock className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="password"
+                    value={adminConfirmPassword}
+                    onChange={(e) => {
+                      setAdminConfirmPassword(e.target.value);
+                      setError("");
+                    }}
+                    placeholder="Confirm new passkey"
+                    className="search-input text-base"
+                    autoComplete="new-password"
+                    name="admin-confirm-password"
+                  />
+                </div>
+                {error && <p className="text-red-400 text-sm">{error}</p>}
+                <button
+                  type="submit"
+                  className="w-full py-3 bg-white text-gray-900 rounded-full font-medium hover:bg-gray-100 transition-colors"
+                >
+                  Update Passkey
+                </button>
+              </form>
+            </div>
+          )}
+
 
           {step === "terminal" && selectedClient && (
             <div>
